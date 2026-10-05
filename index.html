@@ -1,1 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Receipt Maker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
 
+        .receipt {
+            margin-top: 20px;
+            border: 1px solid black;
+            padding: 15px;
+            width: 350px;
+        }
+
+        input, textarea {
+            width: 300px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px 15px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Receipt Generator</h2>
+
+<label>Purchaser:</label><br>
+<input type="text" id="purchaser"><br>
+
+<label>Items Bought:</label><br>
+<textarea id="items" rows="4"
+placeholder="Example:
+Water - 2 QAR
+Chips - 5 QAR"></textarea><br>
+
+<label>Total Price (QAR):</label><br>
+<input type="number" id="total"><br>
+
+<button onclick="makeReceipt()">Generate Receipt</button>
+
+<div id="receipt"></div>
+
+<script>
+function makeReceipt() {
+
+    let today = new Date().toLocaleDateString();
+
+    let purchaser = document.getElementById("purchaser").value;
+    let items = document.getElementById("items").value;
+    let total = document.getElementById("total").value;
+
+    document.getElementById("receipt").innerHTML = `
+        <div class="receipt">
+            <h3>Receipt</h3>
+
+            <p><b>Date:</b> ${today}</p>
+            <p><b>Purchaser:</b> ${purchaser}</p>
+
+            <p><b>Bought Items:</b></p>
+            <pre>${items}</pre>
+
+            <p><b>Total:</b> QAR ${total}</p>
+
+            <hr>
+            <p>Thank you!</p>
+        </div>
+    `;
+}
+</script>
+
+</body>
+</html>
