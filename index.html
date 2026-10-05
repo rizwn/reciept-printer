@@ -1,27 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simple Receipt Maker</title>
+    <title>Receipt Maker</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial;
             padding: 20px;
         }
 
         .receipt {
-            margin-top: 20px;
             border: 1px solid black;
-            padding: 15px;
+            padding: 10px;
+            margin-top: 20px;
             width: 350px;
-        }
-
-        input, textarea {
-            width: 300px;
-            margin-bottom: 10px;
-        }
-
-        button {
-            padding: 8px 15px;
         }
     </style>
 </head>
@@ -29,45 +20,91 @@
 
 <h2>Receipt Generator</h2>
 
-<label>Purchaser:</label><br>
-<input type="text" id="purchaser"><br>
+<input type="text" id="name" placeholder="Purchaser Name">
 
-<label>Items Bought:</label><br>
-<textarea id="items" rows="4"
-placeholder="Example:
-Water - 2 QAR
-Chips - 5 QAR"></textarea><br>
+<h3>Select Items</h3>
 
-<label>Total Price (QAR):</label><br>
-<input type="number" id="total"><br>
+<label>
+    <input type="checkbox" id="premium">
+    Premium Account (50 QAR)
+</label><br>
 
-<button onclick="makeReceipt()">Generate Receipt</button>
+<label>
+    <input type="checkbox" id="pro">
+    Pro Account (35 QAR)
+</label><br>
 
-<div id="receipt"></div>
+<label>
+    <input type="checkbox" id="mid">
+    Mid Account (15 QAR)
+</label><br>
+
+<label>
+    <input type="checkbox" id="iga">
+    I.G.A (10 QAR)
+</label><br><br>
+
+<label>
+    I.B-VIP Months:
+    <input type="number" id="vipMonths" value="0" min="0">
+    (5 QAR/month)
+</label><br><br>
+
+<button onclick="generateReceipt()">Generate Receipt</button>
+
+<div id="output"></div>
 
 <script>
-function makeReceipt() {
+function generateReceipt() {
+
+    let total = 0;
+    let items = [];
+
+    if(document.getElementById("premium").checked){
+        items.push("Premium Account - 50 QAR");
+        total += 50;
+    }
+
+    if(document.getElementById("pro").checked){
+        items.push("Pro Account - 35 QAR");
+        total += 35;
+    }
+
+    if(document.getElementById("mid").checked){
+        items.push("Mid Account - 15 QAR");
+        total += 15;
+    }
+
+    if(document.getElementById("iga").checked){
+        items.push("I.G.A - 10 QAR");
+        total += 10;
+    }
+
+    let months = Number(document.getElementById("vipMonths").value);
+
+    if(months > 0){
+        let vipCost = months * 5;
+        items.push(`I.B-VIP (${months} month(s)) - ${vipCost} QAR`);
+        total += vipCost;
+    }
 
     let today = new Date().toLocaleDateString();
+    let purchaser = document.getElementById("name").value;
 
-    let purchaser = document.getElementById("purchaser").value;
-    let items = document.getElementById("items").value;
-    let total = document.getElementById("total").value;
-
-    document.getElementById("receipt").innerHTML = `
+    document.getElementById("output").innerHTML = `
         <div class="receipt">
             <h3>Receipt</h3>
-
             <p><b>Date:</b> ${today}</p>
             <p><b>Purchaser:</b> ${purchaser}</p>
 
             <p><b>Bought Items:</b></p>
-            <pre>${items}</pre>
-
-            <p><b>Total:</b> QAR ${total}</p>
+            <ul>
+                ${items.map(item => `<li>${item}</li>`).join("")}
+            </ul>
 
             <hr>
-            <p>Thank you!</p>
+
+            <p><b>Total:</b> ${total} QAR</p>
         </div>
     `;
 }
