@@ -1,111 +1,205 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Receipt Maker</title>
-    <style>
-        body {
-            font-family: Arial;
-            padding: 20px;
-        }
+<meta charset="UTF-8">
+<title>BloxStreet Receipt Generator</title>
 
-        .receipt {
-            border: 1px solid black;
-            padding: 10px;
-            margin-top: 20px;
-            width: 350px;
-        }
-    </style>
+<style>
+body{
+    font-family: Arial, sans-serif;
+    padding:20px;
+    background:#f5f5f5;
+}
+
+h1{
+    margin-bottom:20px;
+}
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    max-width:500px;
+    background:white;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+}
+
+.controls button{
+    width:30px;
+    height:30px;
+    font-size:18px;
+}
+
+.qty{
+    margin:0 10px;
+    font-weight:bold;
+}
+
+.receipt{
+    background:white;
+    margin-top:25px;
+    padding:20px;
+    width:400px;
+    border:1px solid #ddd;
+}
+
+.logo{
+    width:120px;
+    display:block;
+    margin:auto;
+}
+
+.center{
+    text-align:center;
+}
+</style>
 </head>
+
 <body>
 
-<h2>Receipt Generator</h2>
+<h1>BloxStreet Receipt Generator</h1>
 
-<input type="text" id="name" placeholder="Purchaser Name">
+<input type="text" id="customer" placeholder="Purchaser Name">
 
-<h3>Select Items</h3>
+<br><br>
 
-<label>
-    <input type="checkbox" id="premium">
-    Premium Account (50 QAR)
-</label><br>
+<div class="item">
+    <span>Premium Account (50 QAR)</span>
+    <div class="controls">
+        <button onclick="changeQty('premium',-1)">-</button>
+        <span id="premium">0</span>
+        <button onclick="changeQty('premium',1)">+</button>
+    </div>
+</div>
 
-<label>
-    <input type="checkbox" id="pro">
-    Pro Account (35 QAR)
-</label><br>
+<div class="item">
+    <span>Pro Account (35 QAR)</span>
+    <div class="controls">
+        <button onclick="changeQty('pro',-1)">-</button>
+        <span id="pro">0</span>
+        <button onclick="changeQty('pro',1)">+</button>
+    </div>
+</div>
 
-<label>
-    <input type="checkbox" id="mid">
-    Mid Account (15 QAR)
-</label><br>
+<div class="item">
+    <span>Mid Account (15 QAR)</span>
+    <div class="controls">
+        <button onclick="changeQty('mid',-1)">-</button>
+        <span id="mid">0</span>
+        <button onclick="changeQty('mid',1)">+</button>
+    </div>
+</div>
 
-<label>
-    <input type="checkbox" id="iga">
-    I.G.A (10 QAR)
-</label><br><br>
+<div class="item">
+    <span>I.G.A (10 QAR)</span>
+    <div class="controls">
+        <button onclick="changeQty('iga',-1)">-</button>
+        <span id="iga">0</span>
+        <button onclick="changeQty('iga',1)">+</button>
+    </div>
+</div>
 
-<label>
-    I.B-VIP Months:
-    <input type="number" id="vipMonths" value="0" min="0">
-    (5 QAR/month)
-</label><br><br>
+<div class="item">
+    <span>I.G-VIP (20 QAR / Month)</span>
+    <div class="controls">
+        <button onclick="changeQty('vip',-1)">-</button>
+        <span id="vip">0</span>
+        <button onclick="changeQty('vip',1)">+</button>
+    </div>
+</div>
+
+<br>
 
 <button onclick="generateReceipt()">Generate Receipt</button>
 
-<div id="output"></div>
+<div id="receipt"></div>
 
 <script>
-function generateReceipt() {
+
+function changeQty(id, amount){
+    let current = parseInt(document.getElementById(id).innerText);
+
+    current += amount;
+
+    if(current < 0){
+        current = 0;
+    }
+
+    document.getElementById(id).innerText = current;
+}
+
+function generateReceipt(){
 
     let total = 0;
-    let items = [];
+    let items = "";
 
-    if(document.getElementById("premium").checked){
-        items.push("Premium Account - 50 QAR");
-        total += 50;
-    }
+    const products = [
+        ["Premium Account",50,"premium"],
+        ["Pro Account",35,"pro"],
+        ["Mid Account",15,"mid"],
+        ["I.G.A",10,"iga"],
+        ["I.G-VIP Months",20,"vip"]
+    ];
 
-    if(document.getElementById("pro").checked){
-        items.push("Pro Account - 35 QAR");
-        total += 35;
-    }
+    products.forEach(product => {
 
-    if(document.getElementById("mid").checked){
-        items.push("Mid Account - 15 QAR");
-        total += 15;
-    }
+        let qty = parseInt(document.getElementById(product[2]).innerText);
 
-    if(document.getElementById("iga").checked){
-        items.push("I.G.A - 10 QAR");
-        total += 10;
-    }
+        if(qty > 0){
 
-    let months = Number(document.getElementById("vipMonths").value);
+            let price = qty * product[1];
 
-    if(months > 0){
-        let vipCost = months * 5;
-        items.push(`I.B-VIP (${months} month(s)) - ${vipCost} QAR`);
-        total += vipCost;
-    }
+            items += `
+                <tr>
+                    <td>${product[0]}</td>
+                    <td>${qty}</td>
+                    <td>${price} QAR</td>
+                </tr>
+            `;
 
-    let today = new Date().toLocaleDateString();
-    let purchaser = document.getElementById("name").value;
+            total += price;
+        }
+    });
 
-    document.getElementById("output").innerHTML = `
-        <div class="receipt">
-            <h3>Receipt</h3>
-            <p><b>Date:</b> ${today}</p>
-            <p><b>Purchaser:</b> ${purchaser}</p>
+    let purchaser = document.getElementById("customer").value;
+    let date = new Date().toLocaleDateString();
 
-            <p><b>Bought Items:</b></p>
-            <ul>
-                ${items.map(item => `<li>${item}</li>`).join("")}
-            </ul>
+    document.getElementById("receipt").innerHTML = `
 
-            <hr>
+    <div class="receipt">
 
-            <p><b>Total:</b> ${total} QAR</p>
+        <img src="logo.png" class="logo">
+
+        <div class="center">
+            <h2>BloxStreet</h2>
+            <small>by rizzy</small>
         </div>
+
+        <hr>
+
+        <p><b>Date:</b> ${date}</p>
+        <p><b>Purchaser:</b> ${purchaser}</p>
+
+        <table width="100%">
+            <tr>
+                <th align="left">Item</th>
+                <th>Qty</th>
+                <th align="right">Price</th>
+            </tr>
+
+            ${items}
+        </table>
+
+        <hr>
+
+        <h3>Total: ${total} QAR</h3>
+
+        <p>Thank you for purchasing!</p>
+
+    </div>
+
     `;
 }
 </script>
