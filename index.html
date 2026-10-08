@@ -1,73 +1,195 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>BloxStreet Receipt Generator</title>
+    <title>BloxStreet Receipt Generator</title>
 
-<style>
-body{
-    font-family: Arial, sans-serif;
-    padding:20px;
-    background:#f5f5f5;
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .item {
+            margin: 10px 0;
+        }
+
+        button {
+            width: 30px;
+            height: 30px;
+        }
+
+        .qty {
+            display: inline-block;
+            width: 30px;
+            text-align: center;
+        }
+
+        .receipt {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            max-width: 500px;
+        }
+
+        .logo {
+            width: 150px;
+            display: block;
+            margin: auto;
+        }
+
+        table {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<h1>BloxStreet Receipt Generator</h1>
+
+<!-- TEST LOGO -->
+<img src="logo.png" class="logo">
+
+<br>
+
+<input type="text" id="customer" placeholder="Purchaser Name">
+
+<h3>Items</h3>
+
+<div class="item">
+    Premium Account (50 QAR)
+    <button onclick="change('premium',-1)">-</button>
+    <span id="premium" class="qty">0</span>
+    <button onclick="change('premium',1)">+</button>
+</div>
+
+<div class="item">
+    Pro Account (35 QAR)
+    <button onclick="change('pro',-1)">-</button>
+    <span id="pro" class="qty">0</span>
+    <button onclick="change('pro',1)">+</button>
+</div>
+
+<div class="item">
+    Mid Account (15 QAR)
+    <button onclick="change('mid',-1)">-</button>
+    <span id="mid" class="qty">0</span>
+    <button onclick="change('mid',1)">+</button>
+</div>
+
+<div class="item">
+    I.G.A (10 QAR)
+    <button onclick="change('iga',-1)">-</button>
+    <span id="iga" class="qty">0</span>
+    <button onclick="change('iga',1)">+</button>
+</div>
+
+<div class="item">
+    I.G-VIP (20 QAR/month)
+    <button onclick="change('vip',-1)">-</button>
+    <span id="vip" class="qty">0</span>
+    <button onclick="change('vip',1)">+</button>
+</div>
+
+<br>
+
+<button onclick="generateReceipt()">Generate Receipt</button>
+
+<div id="output"></div>
+
+<script>
+
+function change(id,num){
+    let value = Number(document.getElementById(id).innerText);
+
+    value += num;
+
+    if(value < 0){
+        value = 0;
+    }
+
+    document.getElementById(id).innerText = value;
 }
 
-.logo{
-    width:180px;
-    display:block;
-    margin:auto;
+function generateReceipt(){
+
+    let customer = document.getElementById("customer").value;
+    let date = new Date().toLocaleDateString();
+
+    let total = 0;
+    let items = "";
+
+    const products = [
+        ["Premium Account",50,"premium"],
+        ["Pro Account",35,"pro"],
+        ["Mid Account",15,"mid"],
+        ["I.G.A",10,"iga"],
+        ["I.G-VIP",20,"vip"]
+    ];
+
+    for(let i=0;i<products.length;i++){
+
+        let qty = Number(
+            document.getElementById(products[i][2]).innerText
+        );
+
+        if(qty > 0){
+
+            let cost = qty * products[i][1];
+
+            total += cost;
+
+            items += `
+            <tr>
+                <td>${products[i][0]}</td>
+                <td>${qty}</td>
+                <td>${cost} QAR</td>
+            </tr>`;
+        }
+    }
+
+    document.getElementById("output").innerHTML = `
+    <div class="receipt">
+
+        <img src="logo.png" class="logo">
+
+        <h2 style="text-align:center;">
+            BloxStreet
+        </h2>
+
+        <p style="text-align:center;">
+            by rizzy
+        </p>
+
+        <hr>
+
+        <p><b>Date:</b> ${date}</p>
+        <p><b>Purchaser:</b> ${customer}</p>
+
+        <table>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+            </tr>
+
+            ${items}
+        </table>
+
+        <hr>
+
+        <h3>Total: ${total} QAR</h3>
+
+    </div>
+    `;
 }
 
-.header{
-    text-align:center;
-    margin-bottom:20px;
-}
+</script>
 
-.item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:white;
-    padding:10px;
-    margin:8px 0;
-    border-radius:8px;
-    max-width:500px;
-}
-
-.controls button{
-    width:35px;
-    height:35px;
-    font-size:18px;
-    cursor:pointer;
-}
-
-.controls span{
-    margin:0 10px;
-    font-weight:bold;
-    font-size:18px;
-}
-
-.receipt{
-    background:white;
-    width:450px;
-    padding:20px;
-    margin-top:25px;
-    border:1px solid #ccc;
-    border-radius:10px;
-}
-
-.receipt-logo{
-    width:120px;
-    display:block;
-    margin:auto;
-}
-
-.center{
-    text-align:center;
-}
-
-input{
-    padding:8px;
-    width:250px;
-}
-
-.generate
+</body>
+</html>
