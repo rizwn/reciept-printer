@@ -1,63 +1,179 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BloxStreet Receipt Generator</title>
 
 <style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
 body{
-    font-family: Arial, sans-serif;
-    background:#f4f4f4;
-    padding:20px;
+    background:linear-gradient(135deg,#0f0f0f,#1a1a1a,#222);
+    min-height:100vh;
+    padding:30px;
+    color:white;
 }
 
 .container{
-    max-width:700px;
+    max-width:800px;
     margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:12px;
+    background:#181818;
+    border:1px solid rgba(255,180,0,.2);
+    border-radius:20px;
+    padding:30px;
+    box-shadow:0 0 40px rgba(255,180,0,.15);
 }
 
 h1{
     text-align:center;
+    color:#ffbf00;
+    font-size:40px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#c9a227;
+    margin-bottom:25px;
+}
+
+input{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#252525;
+    color:white;
+    font-size:16px;
+    outline:none;
+}
+
+input:focus{
+    box-shadow:0 0 10px rgba(255,180,0,.4);
 }
 
 .item{
     display:flex;
     justify-content:space-between;
-    margin:12px 0;
+    align-items:center;
+    background:#222;
+    border-radius:12px;
+    padding:15px;
+    margin-top:12px;
 }
 
-.qty-controls button{
-    width:35px;
-    height:35px;
+.item:hover{
+    background:#2a2a2a;
+}
+
+.qty-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
 .qty{
-    display:inline-block;
-    width:30px;
+    min-width:25px;
     text-align:center;
+    font-size:18px;
     font-weight:bold;
+    color:#ffbf00;
+}
+
+.qty-controls button{
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:20px;
+    font-weight:bold;
+    background:linear-gradient(135deg,#ffbf00,#ff7a00);
+    color:black;
+}
+
+.qty-controls button:hover{
+    transform:scale(1.05);
+}
+
+.generate-btn{
+    width:100%;
+    margin-top:25px;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    color:black;
+    background:linear-gradient(135deg,#ffbf00,#ff7a00);
+}
+
+.generate-btn:hover{
+    filter:brightness(1.07);
 }
 
 .receipt{
-    margin-top:20px;
-    border:1px solid #ccc;
-    padding:20px;
-    border-radius:10px;
-    background:#fafafa;
+    margin-top:25px;
+    background:#111;
+    border:1px solid rgba(255,180,0,.25);
+    border-radius:16px;
+    padding:25px;
+}
+
+.receipt h2{
+    text-align:center;
+    color:#ffbf00;
+}
+
+.receipt p{
+    margin-top:8px;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
+    margin-top:15px;
 }
 
-th,td{
-    padding:8px;
-    border-bottom:1px solid #ddd;
+th{
+    color:#ffbf00;
+    border-bottom:2px solid #ffbf00;
+    padding:10px;
 }
+
+td{
+    padding:10px;
+    border-bottom:1px solid #333;
+}
+
+.total{
+    text-align:right;
+    margin-top:20px;
+    font-size:26px;
+    color:#ffbf00;
+    font-weight:bold;
+}
+
+.footer{
+    text-align:center;
+    margin-top:15px;
+    color:#999;
+}
+
+.logo{
+    width:140px;
+    display:block;
+    margin:auto auto 15px auto;
+    border-radius:50%;
+}
+
 </style>
 </head>
 
@@ -65,16 +181,13 @@ th,td{
 
 <div class="container">
 
-<h1>BloxStreet</h1>
-<p style="text-align:center;">by rizzy</p>
+<h1>⚜ BloxStreet ⚜</h1>
+<p class="subtitle">Premium Services • by rizzy</p>
 
 <input
 type="text"
 id="customer"
-placeholder="Purchaser Name"
-style="width:100%;padding:10px;">
-
-<br><br>
+placeholder="Purchaser Name">
 
 <div class="item">
     <span>Premium Account (50 QAR)</span>
@@ -121,9 +234,7 @@ style="width:100%;padding:10px;">
     </div>
 </div>
 
-<br>
-
-<button onclick="generateReceipt()">
+<button class="generate-btn" onclick="generateReceipt()">
 Generate Receipt
 </button>
 
@@ -134,7 +245,10 @@ Generate Receipt
 <script>
 
 function changeQty(id, amount){
-    let value = Number(document.getElementById(id).textContent);
+
+    let value =
+    Number(document.getElementById(id).textContent);
+
     value += amount;
 
     if(value < 0){
@@ -146,7 +260,7 @@ function changeQty(id, amount){
 
 function generateReceipt(){
 
-    const items = [
+    const products = [
         ["Premium Account",50,"premium"],
         ["Pro Account",35,"pro"],
         ["Mid Account",15,"mid"],
@@ -154,66 +268,79 @@ function generateReceipt(){
         ["I.G-VIP",20,"vip"]
     ];
 
-    let receiptRows = "";
+    let rows = "";
     let total = 0;
 
-    for(let item of items){
+    products.forEach(product=>{
 
         let qty =
-        Number(document.getElementById(item[2]).textContent);
+        Number(document.getElementById(product[2]).textContent);
 
         if(qty > 0){
 
-            let cost = qty * item[1];
+            let cost = qty * product[1];
             total += cost;
 
-            receiptRows += `
+            rows += `
             <tr>
-                <td>${item[0]}</td>
+                <td>${product[0]}</td>
                 <td>${qty}</td>
                 <td>${cost} QAR</td>
-            </tr>
-            `;
+            </tr>`;
         }
-    }
 
-    let customer =
+    });
+
+    let purchaser =
     document.getElementById("customer").value;
 
     let date =
     new Date().toLocaleDateString();
 
     document.getElementById("output").innerHTML = `
+
     <div class="receipt">
 
-    <h2 style="text-align:center;">
-    BloxStreet
-    </h2>
+        <img src="logo.png"
+        class="logo"
+        onerror="this.style.display='none'">
 
-    <p style="text-align:center;">
-    by rizzy
-    </p>
+        <h2>BloxStreet</h2>
 
-    <hr>
+        <p style="text-align:center;color:#c9a227;">
+        by rizzy
+        </p>
 
-    <p><b>Date:</b> ${date}</p>
-    <p><b>Purchaser:</b> ${customer}</p>
+        <hr style="margin:15px 0;">
 
-    <table>
-        <tr>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Price</th>
-        </tr>
+        <p><b>Date:</b> ${date}</p>
+        <p><b>Purchaser:</b> ${purchaser}</p>
 
-        ${receiptRows}
-    </table>
+        <table>
 
-    <h3>Total: ${total} QAR</h3>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+            </tr>
+
+            ${rows}
+
+        </table>
+
+        <div class="total">
+        Total: ${total} QAR
+        </div>
+
+        <div class="footer">
+        Thank you for choosing BloxStreet
+        </div>
 
     </div>
     `;
+
 }
+
 </script>
 
 </body>
